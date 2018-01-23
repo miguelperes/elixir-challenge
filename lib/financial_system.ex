@@ -4,7 +4,7 @@ defmodule FinancialSystem do
   """
 
   def transfer(source_account, destination_account, value) do
-    case source_account.balance >= value do
+    case FinancialSystem.has_enough(source_account, value) do
       true ->
         { 
           :ok,
@@ -23,6 +23,10 @@ defmodule FinancialSystem do
       {:ok, result} -> result
       {:error, reason} -> reason
     end
+  end
+
+  def has_enough(%FinancialSystem.Account{balance: account_balance}, value) do
+    account_balance >= value
   end
 
 end
