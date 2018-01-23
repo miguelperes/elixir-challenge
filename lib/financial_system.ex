@@ -13,8 +13,9 @@ defmodule FinancialSystem do
             %FinancialSystem.Account{destination_account | balance: destination_account.balance + value}
           }
         }
+
       false ->
-        {:error, "Not enough money. (#{source_account.balance})"}
+        {:error, "Not enough money. (balance: #{source_account.balance})"}
     end
   end
 
