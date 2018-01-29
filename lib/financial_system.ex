@@ -22,7 +22,7 @@ defmodule FinancialSystem do
   def transfer!(source_account, destination_account, value) do
     case transfer(source_account, destination_account, value) do
       {:ok, result} -> result
-      {:error, reason} -> reason
+      {:error, reason} -> raise(reason)
     end
   end
 

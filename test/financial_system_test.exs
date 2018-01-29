@@ -56,19 +56,10 @@ defmodule FinancialSystemTest do
     assert FinancialSystem.transfer(source_account, dest_account, 5.0) == {:error, "Not enough money. (balance: #{source_account.balance.amount})"}
   end
 
-  test "A transfer should be cancelled if an error occurs" do
-    assert :false
-  end
+  test "A transfer should be cancelled if an error occurs" , %{account_1: dest_account, account_2: source_account} do
+    assert_raise RuntimeError, fn ->
+      FinancialSystem.transfer!(source_account, dest_account, 5.0)
+    end
 
-  test "A transfer can be splitted between 2 or more accounts" do
-    assert :false
-  end
-
-  test "User should be able to exchange money between different currencies" do
-    assert :false
-  end
-
-  test "Currencies should be in compliance with ISO 4217" do
-    assert :false
   end
 end
