@@ -3,6 +3,32 @@ defmodule FinancialSystem do
   Documentation for FinancialSystem.
   """
 
+  def transfer(source_account, destination_accounts, value) when is_list(destination_accounts) do
+    case FinancialSystem.has_enough(source_account, value) do
+      true ->
+        split_size = value / length(destination_accounts)
+
+        transfered = Enum.map destination_accounts, fn(acc) ->
+          transfer!(source_account, acc, split_size)
+        end
+
+        dest_updated = for {_source_result, dest_result} <- transfered do
+          dest_result    
+        end
+
+        {
+          :ok,
+          {
+            %FinancialSystem.Account{source_account | balance: FinancialSystem.sub(source_account.balance, value)},
+            dest_updated
+          }          
+        }
+
+      false ->
+        {:error, "Not enough money. (balance: #{source_account.balance.amount})"}
+    end
+  end
+
   def transfer(source_account, destination_account, value) do
     case FinancialSystem.has_enough(source_account, value) do
       true ->
