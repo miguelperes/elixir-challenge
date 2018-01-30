@@ -7,7 +7,9 @@ defmodule FinancialSystemTest do
       :ok,
       [
         account_1: %FinancialSystem.Account{balance: Money.new(:BRL, "10.0")},
-        account_2: %FinancialSystem.Account{balance: Money.new(:BRL, "0.0")}
+        account_2: %FinancialSystem.Account{balance: Money.new(:BRL, "0.0")},
+        account_3: %FinancialSystem.Account{balance: Money.new(:BRL, "200.0")},
+        account_4: %FinancialSystem.Account{balance: Money.new(:BRL, "600.0")},
       ]
     }
   end
@@ -60,6 +62,25 @@ defmodule FinancialSystemTest do
     assert_raise RuntimeError, fn ->
       FinancialSystem.transfer!(source_account, dest_account, 5.0)
     end
-
   end
+
+  test "A transfer can be splitted between 2 or more accounts", %{account_4: source_account} = context do
+    expected_result = {
+      %FinancialSystem.Account{balance: Money.new(:BRL, "300.0")},
+      [
+        %FinancialSystem.Account{balance: Money.new(:BRL, "110.0")},
+        %FinancialSystem.Account{balance: Money.new(:BRL, "100.0")},
+        %FinancialSystem.Account{balance: Money.new(:BRL, "300.0")},
+      ]
+    }
+
+    assert FinancialSystem.transfer!(source_account, [context.account_1, context.account_2, context.account_3], 300.0) == expected_result
+  end
+
+  test "A multiple account transfer should fail if source account doesn't have anough money available", %{account_4: source_account} = context do
+    assert_raise RuntimeError, fn ->
+      FinancialSystem.transfer!(source_account, [context.account_1, context.account_2, context.account_3], 600.01)
+    end
+  end
+
 end
