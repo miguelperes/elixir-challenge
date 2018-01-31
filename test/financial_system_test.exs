@@ -10,6 +10,7 @@ defmodule FinancialSystemTest do
         account_2: %FinancialSystem.Account{balance: Money.new(:BRL, "0.0")},
         account_3: %FinancialSystem.Account{balance: Money.new(:BRL, "200.0")},
         account_4: %FinancialSystem.Account{balance: Money.new(:BRL, "600.0")},
+        usd_account_50: %FinancialSystem.Account{balance: Money.new(:USD, "50.0")},
       ]
     }
   end
@@ -83,4 +84,12 @@ defmodule FinancialSystemTest do
     end
   end
 
+  test "User should be able to exchange money between different currencies", context do
+    expected_result = {
+      %FinancialSystem.Account{account_id: nil, balance: Money.new(:BRL, "150.0")},
+      %FinancialSystem.Account{account_id: nil, balance: Money.new(:USD, "65.8")}
+    }
+
+    assert FinancialSystem.transfer!(context.account_3, context.usd_account_50, 50.0) == expected_result
+  end
 end

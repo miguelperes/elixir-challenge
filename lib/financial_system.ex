@@ -36,7 +36,7 @@ defmodule FinancialSystem do
           :ok,
           {
             %FinancialSystem.Account{source_account | balance: FinancialSystem.sub(source_account.balance, value)},  
-            %FinancialSystem.Account{destination_account | balance: FinancialSystem.add(destination_account.balance, value)}
+            %FinancialSystem.Account{destination_account | balance: FinancialSystem.add(destination_account.balance, FinancialSystem.Currency.convert(value, source_account.balance.currency, destination_account.balance.currency))}
           }
         }
 
