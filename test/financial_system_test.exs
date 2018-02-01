@@ -10,7 +10,7 @@ defmodule FinancialSystemTest do
         account_2: %FinancialSystem.Account{balance: Money.new(:BRL, "0.0")},
         account_3: %FinancialSystem.Account{balance: Money.new(:BRL, "200.0")},
         account_4: %FinancialSystem.Account{balance: Money.new(:BRL, "600.0")},
-        usd_account_50: %FinancialSystem.Account{balance: Money.new(:USD, "50.0")},
+        usd_account_50: %FinancialSystem.Account{balance: Money.new(:USD, "50.0")}
       ]
     }
   end
@@ -25,20 +25,22 @@ defmodule FinancialSystemTest do
 
   test "Add some amount to a money struct", %{account_1: %FinancialSystem.Account{balance: money}} do
     value_to_add = 1.75
-    
-    expected_result = 
+
+    expected_result =
       value_to_add
-      |> Decimal.new
+      |> Decimal.new()
       |> Decimal.add(money.amount)
       |> Money.new(:BRL)
 
     assert FinancialSystem.add(money, value_to_add) == expected_result
   end
 
-  test "Subtract some amount from a money struct", %{account_1: %FinancialSystem.Account{balance: money}} do
+  test "Subtract some amount from a money struct", %{
+    account_1: %FinancialSystem.Account{balance: money}
+  } do
     value_to_sub = Decimal.new(1.75)
-    
-    expected_result = 
+
+    expected_result =
       money.amount
       |> Decimal.sub(value_to_sub)
       |> Money.new(:BRL)
@@ -46,41 +48,61 @@ defmodule FinancialSystemTest do
     assert FinancialSystem.sub(money, value_to_sub) == expected_result
   end
 
-  test "User should be able to transfer money to another account", %{account_1: source_account, account_2: dest_account} do
+  test "User should be able to transfer money to another account", %{
+    account_1: source_account,
+    account_2: dest_account
+  } do
     expected_result = {
       %FinancialSystem.Account{balance: Money.new(:BRL, "3.0")},
-      %FinancialSystem.Account{balance: Money.new(:BRL, "7.0")},
+      %FinancialSystem.Account{balance: Money.new(:BRL, "7.0")}
     }
 
     assert FinancialSystem.transfer!(source_account, dest_account, 7.0) == expected_result
   end
 
-  test "User cannot transfer if not enough money available on the account", %{account_1: dest_account, account_2: source_account} do
-    assert FinancialSystem.transfer(source_account, dest_account, 5.0) == {:error, "Not enough money. (balance: #{source_account.balance.amount})"}
+  test "User cannot transfer if not enough money available on the account", %{
+    account_1: dest_account,
+    account_2: source_account
+  } do
+    assert FinancialSystem.transfer(source_account, dest_account, 5.0) ==
+             {:error, "Not enough money. (balance: #{source_account.balance.amount})"}
   end
 
-  test "A transfer should be cancelled if an error occurs" , %{account_1: dest_account, account_2: source_account} do
+  test "A transfer should be cancelled if an error occurs", %{
+    account_1: dest_account,
+    account_2: source_account
+  } do
     assert_raise RuntimeError, fn ->
       FinancialSystem.transfer!(source_account, dest_account, 5.0)
     end
   end
 
-  test "A transfer can be splitted between 2 or more accounts", %{account_4: source_account} = context do
+  test "A transfer can be splitted between 2 or more accounts",
+       %{account_4: source_account} = context do
     expected_result = {
       %FinancialSystem.Account{balance: Money.new(:BRL, "300.0")},
       [
         %FinancialSystem.Account{balance: Money.new(:BRL, "110.0")},
         %FinancialSystem.Account{balance: Money.new(:BRL, "100.0")},
-        %FinancialSystem.Account{balance: Money.new(:BRL, "300.0")},
+        %FinancialSystem.Account{balance: Money.new(:BRL, "300.0")}
       ]
     }
 
-    assert FinancialSystem.transfer!(source_account, [context.account_1, context.account_2, context.account_3], 300.0) == expected_result
+    assert FinancialSystem.transfer!(
+             source_account,
+             [context.account_1, context.account_2, context.account_3],
+             300.0
+           ) == expected_result
   end
 
-  test "A multiple account transfer should fail if source account doesn't have anough money available", %{account_4: source_account} = context do
+  test "A multiple account transfer should fail if source account doesn't have anough money available",
+       %{account_4: source_account} = context do
     assert_raise RuntimeError, fn ->
-      FinancialSystem.transfer!(source_account, [context.account_1, context.account_2, context.account_3], 600.01)
+      FinancialSystem.transfer!(
+        source_account,
+        [context.account_1, context.account_2, context.account_3],
+        600.01
+      )
     end
   end
 
@@ -90,6 +112,7 @@ defmodule FinancialSystemTest do
       %FinancialSystem.Account{account_id: nil, balance: Money.new(:USD, "65.8")}
     }
 
-    assert FinancialSystem.transfer!(context.account_3, context.usd_account_50, 50.0) == expected_result
+    assert FinancialSystem.transfer!(context.account_3, context.usd_account_50, 50.0) ==
+             expected_result
   end
 end

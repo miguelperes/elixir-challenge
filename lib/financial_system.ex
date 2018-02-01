@@ -8,20 +8,25 @@ defmodule FinancialSystem do
       true ->
         split_size = value / length(destination_accounts)
 
-        transfered = Enum.map destination_accounts, fn(acc) ->
-          transfer!(source_account, acc, split_size)
-        end
+        transfered =
+          Enum.map(destination_accounts, fn acc ->
+            transfer!(source_account, acc, split_size)
+          end)
 
-        dest_updated = for {_source_result, dest_result} <- transfered do
-          dest_result    
-        end
+        dest_updated =
+          for {_source_result, dest_result} <- transfered do
+            dest_result
+          end
 
         {
           :ok,
           {
-            %FinancialSystem.Account{source_account | balance: FinancialSystem.sub(source_account.balance, value)},
+            %FinancialSystem.Account{
+              source_account
+              | balance: FinancialSystem.sub(source_account.balance, value)
+            },
             dest_updated
-          }          
+          }
         }
 
       false ->
@@ -32,11 +37,25 @@ defmodule FinancialSystem do
   def transfer(source_account, destination_account, value) do
     case FinancialSystem.has_enough(source_account, value) do
       true ->
-        { 
+        {
           :ok,
           {
-            %FinancialSystem.Account{source_account | balance: FinancialSystem.sub(source_account.balance, value)},  
-            %FinancialSystem.Account{destination_account | balance: FinancialSystem.add(destination_account.balance, FinancialSystem.Currency.convert!(value, source_account.balance.currency, destination_account.balance.currency))}
+            %FinancialSystem.Account{
+              source_account
+              | balance: FinancialSystem.sub(source_account.balance, value)
+            },
+            %FinancialSystem.Account{
+              destination_account
+              | balance:
+                  FinancialSystem.add(
+                    destination_account.balance,
+                    FinancialSystem.Currency.convert!(
+                      value,
+                      source_account.balance.currency,
+                      destination_account.balance.currency
+                    )
+                  )
+            }
           }
         }
 
@@ -75,5 +94,4 @@ defmodule FinancialSystem do
   def has_enough(%FinancialSystem.Account{balance: money}, value) do
     Decimal.to_float(money.amount) >= value
   end
-
 end
