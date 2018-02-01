@@ -52,5 +52,4 @@ defmodule CurrencyTest do
       FinancialSystem.Currency.convert!(200.0, :BBB, :BBB)
     end
   end
-
 end
