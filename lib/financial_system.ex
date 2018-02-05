@@ -47,28 +47,24 @@ defmodule FinancialSystem do
   def transfer(source_account, destination_accounts, value) when is_list(destination_accounts) do
     case FinancialSystem.has_enough(source_account, value) do
       true ->
-        split_size = value / length(destination_accounts)
+        splitted_amount = value / length(destination_accounts)
 
-        transfered =
+        transfers_result =
           Enum.map(destination_accounts, fn acc ->
-            transfer!(source_account, acc, split_size)
+            transfer!(source_account, acc, splitted_amount)
           end)
 
-        dest_updated =
-          for {_source_result, dest_result} <- transfered do
+        updated_source_account = %FinancialSystem.Account{
+          source_account
+          | balance: FinancialSystem.sub(source_account.balance, value)
+        }
+
+        updated_destination_accounts =
+          for {_source_result, dest_result} <- transfers_result do
             dest_result
           end
 
-        {
-          :ok,
-          {
-            %FinancialSystem.Account{
-              source_account
-              | balance: FinancialSystem.sub(source_account.balance, value)
-            },
-            dest_updated
-          }
-        }
+        {:ok, {updated_source_account, updated_destination_accounts}}
 
       false ->
         {:error, "Not enough money. (balance: #{source_account.balance.amount})"}
@@ -82,27 +78,20 @@ defmodule FinancialSystem do
       ) do
     case FinancialSystem.has_enough(source_account, value) do
       true ->
-        {
-          :ok,
-          {
-            %FinancialSystem.Account{
-              source_account
-              | balance: FinancialSystem.sub(source_account.balance, value)
-            },
-            %FinancialSystem.Account{
-              destination_account
-              | balance:
-                  FinancialSystem.add(
-                    destination_account.balance,
-                    FinancialSystem.Currency.convert!(
-                      value,
-                      src_currency,
-                      dest_currency
-                    )
-                  )
-            }
-          }
+        updated_source_account = %FinancialSystem.Account{
+          source_account
+          | balance: FinancialSystem.sub(source_account.balance, value)
         }
+
+        converted_incoming_value =
+          FinancialSystem.Currency.convert!(value, src_currency, dest_currency)
+
+        updated_destination_account = %FinancialSystem.Account{
+          destination_account
+          | balance: FinancialSystem.add(destination_account.balance, converted_incoming_value)
+        }
+
+        {:ok, {updated_source_account, updated_destination_account}}
 
       false ->
         {:error, "Not enough money. (balance: #{source_account.balance.amount})"}
