@@ -1,4 +1,6 @@
 defmodule FinancialSystem do
+  alias FinancialSystem.Account, as: Account
+
   @moduledoc """
   Implements functions to handle monetary transactions, such as 
   transfers (on `FinancialSystem.Account` structs), currency conversion and arithmetic operations on
@@ -40,6 +42,8 @@ defmodule FinancialSystem do
         }
       }
   """
+  @spec transfer(Account.t(), Account.t() | [Account.t()], float) ::
+          {:ok, {Account.t(), Account.t() | [Account.t()]}} | {:error, String.t()}
   def transfer(source_account, destination_accounts, value) when is_list(destination_accounts) do
     case FinancialSystem.has_enough(source_account, value) do
       true ->
@@ -71,7 +75,11 @@ defmodule FinancialSystem do
     end
   end
 
-  def transfer(source_account, destination_account, value) do
+  def transfer(
+        %Account{balance: %Money{currency: src_currency}} = source_account,
+        %Account{balance: %Money{currency: dest_currency}} = destination_account,
+        value
+      ) do
     case FinancialSystem.has_enough(source_account, value) do
       true ->
         {
@@ -88,8 +96,8 @@ defmodule FinancialSystem do
                     destination_account.balance,
                     FinancialSystem.Currency.convert!(
                       value,
-                      source_account.balance.currency,
-                      destination_account.balance.currency
+                      src_currency,
+                      dest_currency
                     )
                   )
             }
@@ -127,6 +135,8 @@ defmodule FinancialSystem do
         ]
       }
   """
+  @spec transfer(Account.t(), Account.t() | [Account.t()], float) ::
+          {Account.t(), Account.t() | [Account.t()]} | no_return
   def transfer!(source_account, destination_account, value) do
     case transfer(source_account, destination_account, value) do
       {:ok, result} -> result
@@ -140,7 +150,11 @@ defmodule FinancialSystem do
   ## Examples
       iex> FinancialSystem.add(Money.new("10.0", :BRL), 10.50)
       Money.new("20.5", :BRL)
+
+      iex> FinancialSystem.add(Money.new("10.0", :BRL), Decimal.new(10.50))
+      Money.new("20.5", :BRL)
   """
+  @spec add(Money.t(), float | integer | String.t() | Decimal.t()) :: Money.t()
   def add(money, value) when is_float(value) or is_integer(value) or is_binary(value) do
     FinancialSystem.add(money, Decimal.new(value))
   end
@@ -158,6 +172,7 @@ defmodule FinancialSystem do
       iex> FinancialSystem.sub(Money.new("10.0", :BRL), 5.0)
       Money.new("5.0", :BRL)
   """
+  @spec add(Money.t(), float | integer | String.t() | Decimal.t()) :: Money.t()
   def sub(money, value) when is_float(value) or is_integer(value) do
     FinancialSystem.sub(money, Decimal.new(value))
   end
@@ -180,6 +195,7 @@ defmodule FinancialSystem do
       iex> FinancialSystem.has_enough(account, 11.0)
       false
   """
+  @spec has_enough(Account.t(), float) :: boolean
   def has_enough(%FinancialSystem.Account{balance: money}, value) do
     Decimal.to_float(money.amount) >= value
   end
