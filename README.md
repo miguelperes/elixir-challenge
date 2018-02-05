@@ -18,6 +18,7 @@ Run `iex -S mix` to start Elixir's interactive shell
 `MIX_ENV=test mix coveralls.detail` to show code coverage details
 
 ## Documentation
+`mix docs` to generate update documentations (as an HTML file)
 
 ## Code Quality
 
