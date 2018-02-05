@@ -23,6 +23,7 @@ defmodule FinancialSystem.Mixfile do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
+      {:ex_doc, "~> 0.16", only: :dev, runtime: false},
       {:excoveralls, "~> 0.8", only: :test},
       {:credo, "~> 0.9.0-rc1", only: [:dev, :test], runtime: false},
       {:ex_money, "~> 2.0.3"}
