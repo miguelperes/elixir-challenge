@@ -2,15 +2,17 @@ defmodule FinancialSystemTest do
   use ExUnit.Case
   doctest FinancialSystem
 
+  alias FinancialSystem.Money, as: Money
+
   setup_all do
     {
       :ok,
       [
-        account_1: %FinancialSystem.Account{balance: Money.new(:BRL, "10.0")},
-        account_2: %FinancialSystem.Account{balance: Money.new(:BRL, "0.0")},
-        account_3: %FinancialSystem.Account{balance: Money.new(:BRL, "200.0")},
-        account_4: %FinancialSystem.Account{balance: Money.new(:BRL, "600.0")},
-        usd_account_50: %FinancialSystem.Account{balance: Money.new(:USD, "50.0")}
+        account_1: %FinancialSystem.Account{balance: Money.new!("10.0", :BRL)},
+        account_2: %FinancialSystem.Account{balance: Money.new!("0.0", :BRL)},
+        account_3: %FinancialSystem.Account{balance: Money.new!("200.0", :BRL)},
+        account_4: %FinancialSystem.Account{balance: Money.new!("600.0", :BRL)},
+        usd_account_50: %FinancialSystem.Account{balance: Money.new!("50.0", :USD)}
       ]
     }
   end
@@ -30,7 +32,7 @@ defmodule FinancialSystemTest do
       value_to_add
       |> Decimal.new()
       |> Decimal.add(money.amount)
-      |> Money.new(:BRL)
+      |> Money.new!(:BRL)
 
     assert FinancialSystem.add(money, value_to_add) == expected_result
   end
@@ -43,7 +45,7 @@ defmodule FinancialSystemTest do
     expected_result =
       money.amount
       |> Decimal.sub(value_to_sub)
-      |> Money.new(:BRL)
+      |> Money.new!(:BRL)
 
     assert FinancialSystem.sub(money, value_to_sub) == expected_result
   end
@@ -53,8 +55,8 @@ defmodule FinancialSystemTest do
     account_2: dest_account
   } do
     expected_result = {
-      %FinancialSystem.Account{balance: Money.new(:BRL, "3.0")},
-      %FinancialSystem.Account{balance: Money.new(:BRL, "7.0")}
+      %FinancialSystem.Account{balance: Money.new!("3.0", :BRL)},
+      %FinancialSystem.Account{balance: Money.new!("7.0", :BRL)}
     }
 
     assert FinancialSystem.transfer!(source_account, dest_account, 7.0) == expected_result
@@ -80,11 +82,11 @@ defmodule FinancialSystemTest do
   test "A transfer can be splitted between 2 or more accounts",
        %{account_4: source_account} = context do
     expected_result = {
-      %FinancialSystem.Account{balance: Money.new(:BRL, "300.0")},
+      %FinancialSystem.Account{balance: Money.new!("300.0", :BRL)},
       [
-        %FinancialSystem.Account{balance: Money.new(:BRL, "110.0")},
-        %FinancialSystem.Account{balance: Money.new(:BRL, "100.0")},
-        %FinancialSystem.Account{balance: Money.new(:BRL, "300.0")}
+        %FinancialSystem.Account{balance: Money.new!("110.0", :BRL)},
+        %FinancialSystem.Account{balance: Money.new!("100.0", :BRL)},
+        %FinancialSystem.Account{balance: Money.new!("300.0", :BRL)}
       ]
     }
 
@@ -108,8 +110,8 @@ defmodule FinancialSystemTest do
 
   test "User should be able to exchange money between different currencies", context do
     expected_result = {
-      %FinancialSystem.Account{account_id: nil, balance: Money.new(:BRL, "150.0")},
-      %FinancialSystem.Account{account_id: nil, balance: Money.new(:USD, "65.8")}
+      %FinancialSystem.Account{account_id: nil, balance: Money.new!("150.0", :BRL)},
+      %FinancialSystem.Account{account_id: nil, balance: Money.new!("65.8", :USD)}
     }
 
     assert FinancialSystem.transfer!(context.account_3, context.usd_account_50, 50.0) ==
