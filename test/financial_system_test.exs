@@ -12,7 +12,7 @@ defmodule FinancialSystemTest do
         account_2: FinancialSystem.Account.new("0.0", :BRL),
         account_3: FinancialSystem.Account.new("200.0", :BRL),
         account_4: FinancialSystem.Account.new("600.0", :BRL),
-        usd_account_50: FinancialSystem.Account.new("50.0", :USD),
+        usd_account_50: FinancialSystem.Account.new("50.0", :USD)
       ]
     }
   end
@@ -48,6 +48,21 @@ defmodule FinancialSystemTest do
       |> Money.new!(:BRL)
 
     assert FinancialSystem.sub(money, value_to_sub) == expected_result
+  end
+
+  test "Subtract a value greater than the Money amount", %{
+    account_1: %FinancialSystem.Account{balance: money}
+  } do
+    value_to_sub = Decimal.new(11.0)
+
+    expected_result =
+      money.amount
+      |> Decimal.sub(value_to_sub)
+      |> Money.new!(:BRL)
+
+    assert_raise RuntimeError, fn ->
+      FinancialSystem.sub(money, value_to_sub)
+    end
   end
 
   test "User should be able to transfer money to another account", %{
