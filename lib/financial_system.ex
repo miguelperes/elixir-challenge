@@ -79,18 +79,13 @@ defmodule FinancialSystem do
       ) do
     case FinancialSystem.has_enough(source_account, value) do
       true ->
-        updated_source_account = %FinancialSystem.Account{
-          source_account
-          | balance: FinancialSystem.sub(source_account.balance, value)
-        }
-
         converted_incoming_value =
           FinancialSystem.Currency.convert!(value, src_currency, dest_currency)
 
-        updated_destination_account = %FinancialSystem.Account{
-          destination_account
-          | balance: FinancialSystem.add(destination_account.balance, converted_incoming_value)
-        }
+        updated_source_account = FinancialSystem.sub(source_account, value)
+
+        updated_destination_account =
+          FinancialSystem.add(destination_account, converted_incoming_value)
 
         {:ok, {updated_source_account, updated_destination_account}}
 
@@ -125,7 +120,7 @@ defmodule FinancialSystem do
         ]
       }
   """
-  @spec transfer(Account.t(), Account.t() | [Account.t()], float) ::
+  @spec transfer!(Account.t(), Account.t() | [Account.t()], float) ::
           {Account.t(), Account.t() | [Account.t()]} | no_return
   def transfer!(source_account, destination_account, value) do
     case transfer(source_account, destination_account, value) do
@@ -135,7 +130,8 @@ defmodule FinancialSystem do
   end
 
   @doc """
-  Returns a new `Money` structure with `value` added to original `money`
+  Given a `FinancialSystem.Account` or `FinancialSystem.Money`, it returns an updated 
+  version with `value` added to it
 
   ## Examples
       iex> FinancialSystem.add(FinancialSystem.Money.new!("10.0", :BRL), 10.50)
@@ -143,8 +139,12 @@ defmodule FinancialSystem do
 
       iex> FinancialSystem.add(FinancialSystem.Money.new!("10.0", :BRL), Decimal.new(10.50))
       FinancialSystem.Money.new!("20.5", :BRL)
+      
+      iex> FinancialSystem.add(FinancialSystem.Account.new("10.0", :BRL), "10.50")
+      FinancialSystem.Account.new("20.50", :BRL)
   """
-  @spec add(Money.t(), float | integer | String.t() | Decimal.t()) :: Money.t()
+  @spec add(Money.t() | Account.t(), float | integer | String.t() | Decimal.t()) ::
+          Money.t() | Account.t()
   def add(money, value) when is_float(value) or is_integer(value) or is_binary(value) do
     FinancialSystem.add(money, Decimal.new(value))
   end
@@ -155,22 +155,41 @@ defmodule FinancialSystem do
     |> Money.new!(currency)
   end
 
+  def add(%Account{balance: money} = account, value) do
+    %FinancialSystem.Account{account | balance: FinancialSystem.add(money, value)}
+  end
+
   @doc """
-  Returns a new `Money` structure with `value` subtracted from original `money`
+  Given a `FinancialSystem.Account` or `FinancialSystem.Money`, it returns an updated 
+  version with `value` subtracted from it
 
   ## Examples
       iex> FinancialSystem.sub(FinancialSystem.Money.new!("10.0", :BRL), 5.0)
       FinancialSystem.Money.new!("5.0", :BRL)
+
+      iex> FinancialSystem.sub(FinancialSystem.Account.new("10.0", :BRL), "5.0")
+      FinancialSystem.Account.new("5.0", :BRL)
   """
-  @spec add(Money.t(), float | integer | String.t() | Decimal.t()) :: Money.t()
-  def sub(money, value) when is_float(value) or is_integer(value) do
+  @spec sub(Money.t() | Account.t(), float | integer | String.t() | Decimal.t()) ::
+          Money.t() | Account.t()
+  def sub(money, value) when is_float(value) or is_integer(value) or is_binary(value) do
     FinancialSystem.sub(money, Decimal.new(value))
   end
 
   def sub(%Money{amount: amount, currency: currency}, value) do
-    amount
-    |> Decimal.sub(value)
-    |> Money.new!(currency)
+    case Decimal.cmp(amount, value) == :gt do
+      true ->
+        amount
+        |> Decimal.sub(value)
+        |> Money.new!(currency)
+
+      false ->
+        raise("Not enough money to subract")
+    end
+  end
+
+  def sub(%Account{balance: money} = account, value) do
+    %FinancialSystem.Account{account | balance: FinancialSystem.sub(money, value)}
   end
 
   @doc """
