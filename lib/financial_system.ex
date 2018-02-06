@@ -23,8 +23,8 @@ defmodule FinancialSystem do
       {
         :ok,
         {
-          %FinancialSystem.Account{account_id: nil, balance: FinancialSystem.Money.new!("5.50", :USD)},
-          %FinancialSystem.Account{account_id: nil, balance: FinancialSystem.Money.new!("5.0", :USD)}
+          FinancialSystem.Account.new("5.50", :USD),
+          FinancialSystem.Account.new("5.0", :USD),
         }
       }
 
@@ -35,10 +35,10 @@ defmodule FinancialSystem do
       {
         :ok,
         {
-          %FinancialSystem.Account{account_id: nil, balance: FinancialSystem.Money.new!("400.0", :USD)},
+          FinancialSystem.Account.new("400.0", :USD),
           [
-            %FinancialSystem.Account{account_id: nil, balance: FinancialSystem.Money.new!("60.50", :USD)},
-            %FinancialSystem.Account{account_id: nil, balance: FinancialSystem.Money.new!("50.0", :USD)}
+            FinancialSystem.Account.new("60.50", :USD),
+            FinancialSystem.Account.new("50.0", :USD),
           ]
         }
       }
@@ -109,8 +109,8 @@ defmodule FinancialSystem do
       iex> account2 = FinancialSystem.Account.new("0.0", :USD)
       iex> FinancialSystem.transfer!(account1, account2, 5.0)
       {
-        %FinancialSystem.Account{account_id: nil, balance: FinancialSystem.Money.new!("5.50", :USD)},
-        %FinancialSystem.Account{account_id: nil, balance: FinancialSystem.Money.new!("5.0", :USD)}
+        FinancialSystem.Account.new("5.50", :USD),
+        FinancialSystem.Account.new("5.0", :USD)
       }
 
       iex> account1 = FinancialSystem.Account.new("10.50", :USD)
@@ -118,10 +118,10 @@ defmodule FinancialSystem do
       iex> account3 = FinancialSystem.Account.new("500.0", :USD)
       iex> FinancialSystem.transfer!(account3, [account1, account2], 100.0)
       {
-        %FinancialSystem.Account{account_id: nil, balance: FinancialSystem.Money.new!("400.0", :USD)},
+        FinancialSystem.Account.new("400.0", :USD),
         [
-          %FinancialSystem.Account{account_id: nil, balance: FinancialSystem.Money.new!("60.50", :USD)},
-          %FinancialSystem.Account{account_id: nil, balance: FinancialSystem.Money.new!("50.0", :USD)}
+          FinancialSystem.Account.new("60.50", :USD),
+          FinancialSystem.Account.new("50.0", :USD)
         ]
       }
   """
