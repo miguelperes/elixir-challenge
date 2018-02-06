@@ -77,12 +77,26 @@ defmodule FinancialSystem.Currency do
   Returns a converted value, given an exchange rate
 
   ## Examples
-      iex> FinancialSystem.Currency.convert(10.0, 0.8) # Canadian Dollar exchange rate
+      iex> FinancialSystem.Currency.convert!(10.0, 0.8) # Canadian Dollar exchange rate
       8.0      
   """
-  @spec convert(float, float) :: float
+  @spec convert(float, float) :: {:ok, float} | {:error, String.t}
   def convert(value, exchange_rate) do
-    Float.round(value * exchange_rate, 2)
+    case exchange_rate > 0 do
+      true ->
+        {:ok, Float.round(value * exchange_rate, 2)}
+
+      false ->
+        {:error, "Invalid exchange rate"}
+    end
+  end
+
+  @spec convert!(float, float) :: float | no_return
+  def convert!(value, exchange_rate) do
+    case convert(value, exchange_rate) do
+      {:ok, result} -> result
+      {:error, reason} -> raise(reason)
+    end
   end
 
   @doc """
