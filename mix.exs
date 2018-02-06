@@ -26,9 +26,7 @@ defmodule FinancialSystem.Mixfile do
       {:ex_doc, "~> 0.16", only: :dev, runtime: false},
       {:excoveralls, "~> 0.8", only: :test},
       {:credo, "~> 0.9.0-rc1", only: [:dev, :test], runtime: false},
-      {:ex_money, "~> 2.0.3"}
-      # {:dep_from_hexpm, "~> 0.3.0"},
-      # {:dep_from_git, git: "https://github.com/elixir-lang/my_dep.git", tag: "0.1.0"},
+      {:decimal, "~> 1.0"}
     ]
   end
 end

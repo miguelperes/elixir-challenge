@@ -2,11 +2,12 @@ defmodule FinancialSystem.Account do
   @moduledoc """
   Define struct and functions related to Account.
   """
+  alias FinancialSystem.Money, as: Money
 
-  defstruct account_id: nil, balance: Money.new!(:BRL, 0)
+  defstruct account_id: nil, balance: Money.new!(0, :BRL)
 
   @typedoc """
-  A custom type that represents a `FinancialSystem.Account` struct
+  A custom type that abstracts an account
   """
   @type t :: %FinancialSystem.Account{account_id: integer(), balance: Money.t()}
 
@@ -15,7 +16,7 @@ defmodule FinancialSystem.Account do
 
   ## Examples
       iex> FinancialSystem.Account.new("150.75", :USD)
-      %FinancialSystem.Account{balance: Money.new!("150.75", :USD)}  
+      %FinancialSystem.Account{balance: Money.new!("150.75", :USD)}
       
       iex> FinancialSystem.Account.new("150.75", :USD, 123456)
       %FinancialSystem.Account{balance: Money.new!("150.75", :USD), account_id: 123456}  

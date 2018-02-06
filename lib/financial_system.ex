@@ -1,5 +1,6 @@
 defmodule FinancialSystem do
   alias FinancialSystem.Account, as: Account
+  alias FinancialSystem.Money, as: Money
 
   @moduledoc """
   Implements functions to handle monetary transactions, such as 
@@ -22,8 +23,8 @@ defmodule FinancialSystem do
       {
         :ok,
         {
-          %FinancialSystem.Account{account_id: nil, balance: Money.new("5.50", :USD)},
-          %FinancialSystem.Account{account_id: nil, balance: Money.new("5.0", :USD)}
+          FinancialSystem.Account.new("5.50", :USD),
+          FinancialSystem.Account.new("5.0", :USD),
         }
       }
 
@@ -34,10 +35,10 @@ defmodule FinancialSystem do
       {
         :ok,
         {
-          %FinancialSystem.Account{account_id: nil, balance: Money.new("400.0", :USD)},
+          FinancialSystem.Account.new("400.0", :USD),
           [
-            %FinancialSystem.Account{account_id: nil, balance: Money.new("60.50", :USD)},
-            %FinancialSystem.Account{account_id: nil, balance: Money.new("50.0", :USD)}
+            FinancialSystem.Account.new("60.50", :USD),
+            FinancialSystem.Account.new("50.0", :USD),
           ]
         }
       }
@@ -108,8 +109,8 @@ defmodule FinancialSystem do
       iex> account2 = FinancialSystem.Account.new("0.0", :USD)
       iex> FinancialSystem.transfer!(account1, account2, 5.0)
       {
-        %FinancialSystem.Account{account_id: nil, balance: Money.new("5.50", :USD)},
-        %FinancialSystem.Account{account_id: nil, balance: Money.new("5.0", :USD)}
+        FinancialSystem.Account.new("5.50", :USD),
+        FinancialSystem.Account.new("5.0", :USD)
       }
 
       iex> account1 = FinancialSystem.Account.new("10.50", :USD)
@@ -117,10 +118,10 @@ defmodule FinancialSystem do
       iex> account3 = FinancialSystem.Account.new("500.0", :USD)
       iex> FinancialSystem.transfer!(account3, [account1, account2], 100.0)
       {
-        %FinancialSystem.Account{account_id: nil, balance: Money.new("400.0", :USD)},
+        FinancialSystem.Account.new("400.0", :USD),
         [
-          %FinancialSystem.Account{account_id: nil, balance: Money.new("60.50", :USD)},
-          %FinancialSystem.Account{account_id: nil, balance: Money.new("50.0", :USD)}
+          FinancialSystem.Account.new("60.50", :USD),
+          FinancialSystem.Account.new("50.0", :USD)
         ]
       }
   """
@@ -137,11 +138,11 @@ defmodule FinancialSystem do
   Returns a new `Money` structure with `value` added to original `money`
 
   ## Examples
-      iex> FinancialSystem.add(Money.new("10.0", :BRL), 10.50)
-      Money.new("20.5", :BRL)
+      iex> FinancialSystem.add(FinancialSystem.Money.new!("10.0", :BRL), 10.50)
+      FinancialSystem.Money.new!("20.5", :BRL)
 
-      iex> FinancialSystem.add(Money.new("10.0", :BRL), Decimal.new(10.50))
-      Money.new("20.5", :BRL)
+      iex> FinancialSystem.add(FinancialSystem.Money.new!("10.0", :BRL), Decimal.new(10.50))
+      FinancialSystem.Money.new!("20.5", :BRL)
   """
   @spec add(Money.t(), float | integer | String.t() | Decimal.t()) :: Money.t()
   def add(money, value) when is_float(value) or is_integer(value) or is_binary(value) do
@@ -151,15 +152,15 @@ defmodule FinancialSystem do
   def add(%Money{amount: amount, currency: currency}, value) do
     amount
     |> Decimal.add(value)
-    |> Money.new(currency)
+    |> Money.new!(currency)
   end
 
   @doc """
   Returns a new `Money` structure with `value` subtracted from original `money`
 
   ## Examples
-      iex> FinancialSystem.sub(Money.new("10.0", :BRL), 5.0)
-      Money.new("5.0", :BRL)
+      iex> FinancialSystem.sub(FinancialSystem.Money.new!("10.0", :BRL), 5.0)
+      FinancialSystem.Money.new!("5.0", :BRL)
   """
   @spec add(Money.t(), float | integer | String.t() | Decimal.t()) :: Money.t()
   def sub(money, value) when is_float(value) or is_integer(value) do
@@ -169,7 +170,7 @@ defmodule FinancialSystem do
   def sub(%Money{amount: amount, currency: currency}, value) do
     amount
     |> Decimal.sub(value)
-    |> Money.new(currency)
+    |> Money.new!(currency)
   end
 
   @doc """
