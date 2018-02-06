@@ -19,7 +19,13 @@ defmodule CurrencyTest do
   end
 
   test "Check conversion using exchange rate instead of currency symbols. (Not using rates cache)" do
-    assert FinancialSystem.Currency.convert(10.0, 3.15) == Float.round(10.0 * 3.15, 2)
+    assert FinancialSystem.Currency.convert!(10.0, 3.15) == Float.round(10.0 * 3.15, 2)
+  end
+
+  test "Error when trying to convert using an invalid rate" do
+    assert_raise RuntimeError, fn ->
+      FinancialSystem.Currency.convert!(10.0, -5)
+    end
   end
 
   # This test was replaced by all the other tests below
