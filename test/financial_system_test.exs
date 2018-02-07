@@ -55,11 +55,6 @@ defmodule FinancialSystemTest do
   } do
     value_to_sub = Decimal.new(11.0)
 
-    expected_result =
-      money.amount
-      |> Decimal.sub(value_to_sub)
-      |> Money.new!(:BRL)
-
     assert_raise RuntimeError, fn ->
       FinancialSystem.sub(money, value_to_sub)
     end
