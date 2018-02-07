@@ -21,8 +21,8 @@ defmodule FinancialSystem.Account do
       iex> FinancialSystem.Account.new("150.75", :USD, 123456)
       %FinancialSystem.Account{balance: Money.new!("150.75", :USD), account_id: 123456}  
   """
-  @spec new(Money.t(), atom, integer) :: FinancialSystem.Account.t()
-  def new(balance, currency, id \\ nil) do
-    %FinancialSystem.Account{balance: Money.new!(balance, currency), account_id: id}
+  @spec new(String.t(), atom, integer | nil) :: FinancialSystem.Account.t()
+  def new(balance_amount, currency, id \\ nil) do
+    %FinancialSystem.Account{balance: Money.new!(balance_amount, currency), account_id: id}
   end
 end

@@ -80,7 +80,7 @@ defmodule FinancialSystem.Currency do
       iex> FinancialSystem.Currency.convert!(10.0, 0.8) # Canadian Dollar exchange rate
       8.0      
   """
-  @spec convert(float, float) :: {:ok, float} | {:error, String.t}
+  @spec convert(float, float) :: {:ok, float} | {:error, String.t()}
   def convert(value, exchange_rate) do
     case exchange_rate > 0 do
       true ->
