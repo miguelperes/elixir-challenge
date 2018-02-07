@@ -55,15 +55,12 @@ defmodule FinancialSystem do
             transfer!(source_account, acc, splitted_amount)
           end)
 
-        updated_source_account = %FinancialSystem.Account{
-          source_account
-          | balance: FinancialSystem.sub(source_account.balance, value)
-        }
-
         updated_destination_accounts =
           for {_source_result, dest_result} <- transfers_result do
             dest_result
           end
+
+        updated_source_account = FinancialSystem.sub(source_account, value)
 
         {:ok, {updated_source_account, updated_destination_accounts}}
 

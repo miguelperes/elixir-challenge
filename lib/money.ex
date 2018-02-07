@@ -47,7 +47,8 @@ defmodule FinancialSystem.Money do
       iex> FinancialSystem.Money.new("150.75", :USD)
       {:ok, %FinancialSystem.Money{amount: Decimal.new("150.75"), currency: :USD}}
   """
-  @spec new(String.t() | Decimal.t(), atom) :: {:ok, FinancialSystem.Money.t()} | {:error, String.t()}
+  @spec new(String.t() | Decimal.t(), atom) ::
+          {:ok, FinancialSystem.Money.t()} | {:error, String.t()}
   def new(string_amount, currency) do
     case Currency.valid_currency?(currency) do
       true ->
