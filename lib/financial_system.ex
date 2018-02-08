@@ -127,6 +127,93 @@ defmodule FinancialSystem do
   end
 
   @doc """
+  Transfer money from one account to multiple accounts, but weighted, passing a list of the weights 
+  in the same order of the accounts. Check examples below. <br/>
+  Returns `{:ok, {updated_source_account, updated_destination_account_list}}` if transfer was successfull,
+  otherwise `{:error, reason}`.
+
+  ## Examples      
+
+      iex> source_account = FinancialSystem.Account.new("1500.0", :USD)
+      iex> account1 = FinancialSystem.Account.new("0.0", :USD)
+      iex> account2 = FinancialSystem.Account.new("0.0", :USD)
+      iex> account3 = FinancialSystem.Account.new("0.0", :USD)
+      iex> account4 = FinancialSystem.Account.new("0.0", :USD)
+      iex> FinancialSystem.weighted_transfer(source_account, [account1, account2, account3, account4], 1000.0, [1, 1, 2, 4])
+      {
+        :ok,
+        {
+          FinancialSystem.Account.new("500.0", :USD),
+          [
+            FinancialSystem.Account.new("125.0", :USD),
+            FinancialSystem.Account.new("125.0", :USD),
+            FinancialSystem.Account.new("250.0", :USD),
+            FinancialSystem.Account.new("500.0", :USD)
+          ]
+        }
+      }
+  """
+  @spec weighted_transfer(Account.t(), [Account.t()], float, [integer]) ::
+          {:ok, {Account.t(), [Account.t()]}} | {:error, String.t()}
+  def weighted_transfer(source_account, destination_accounts, value, weights)
+      when is_list(weights) do
+    case FinancialSystem.has_enough(source_account, value) do
+      true ->
+        total_parts = Enum.sum(weights)
+        unit_amount = value / total_parts
+
+        transfers_result =
+          destination_accounts
+          |> Enum.with_index()
+          |> Enum.map(fn {acc, acc_index} ->
+            amount_to_transfer = unit_amount * Enum.at(weights, acc_index)
+            transfer!(source_account, acc, amount_to_transfer)
+          end)
+
+        updated_destination_accounts =
+          for {_source_result, dest_result} <- transfers_result do
+            dest_result
+          end
+
+        updated_source_account = FinancialSystem.sub(source_account, value)
+        {:ok, {updated_source_account, updated_destination_accounts}}
+
+      false ->
+        {:error, "Not enough money. (balance: #{source_account.balance.amount})"}
+    end
+  end
+
+  @doc """
+  Similar to `FinancialSystem.weighted_transfer/4`, but returns unwrapped.
+
+  ## Examples      
+
+      iex> source_account = FinancialSystem.Account.new("1500.0", :USD)
+      iex> account1 = FinancialSystem.Account.new("0.0", :USD)
+      iex> account2 = FinancialSystem.Account.new("0.0", :USD)
+      iex> account3 = FinancialSystem.Account.new("0.0", :USD)
+      iex> account4 = FinancialSystem.Account.new("0.0", :USD)
+      iex> FinancialSystem.weighted_transfer!(source_account, [account1, account2, account3, account4], 1000.0, [1, 1, 2, 4])
+      {
+        FinancialSystem.Account.new("500.0", :USD),
+        [
+          FinancialSystem.Account.new("125.0", :USD),
+          FinancialSystem.Account.new("125.0", :USD),
+          FinancialSystem.Account.new("250.0", :USD),
+          FinancialSystem.Account.new("500.0", :USD)
+        ]
+      }
+  """
+  @spec weighted_transfer!(Account.t(), [Account.t()], float, [integer]) ::
+          {Account.t(), [Account.t()]} | no_return
+  def weighted_transfer!(source_account, destination_accounts, value, weights) do
+    case weighted_transfer(source_account, destination_accounts, value, weights) do
+      {:ok, result} -> result
+      {:error, reason} -> raise(reason)
+    end
+  end
+
+  @doc """
   Given a `FinancialSystem.Account` or `FinancialSystem.Money`, it returns an updated 
   version with `value` added to it
 
