@@ -127,4 +127,34 @@ defmodule FinancialSystemTest do
     assert FinancialSystem.transfer!(context.account_3, context.usd_account_50, 50.0) ==
              expected_result
   end
+
+  test "Multiple account transfer with different weights (total of 300, but 100 for one account and 200 to the other)",
+       %{account_4: source_account} = context do
+    expected_result = {
+      FinancialSystem.Account.new("300.0", :BRL),
+      [
+        FinancialSystem.Account.new("210.0", :BRL),
+        FinancialSystem.Account.new("100.0", :BRL)
+      ]
+    }
+
+    assert FinancialSystem.weighted_transfer!(
+             source_account,
+             [context.account_1, context.account_2],
+             300.0,
+             [2, 1]
+           ) == expected_result
+  end
+
+  test "Multiple account transfer with weights, but not enough money to transfer",
+       %{account_4: source_account} = context do
+    assert_raise RuntimeError, fn ->
+      FinancialSystem.weighted_transfer!(
+        source_account,
+        [context.account_1, context.account_2],
+        999.0,
+        [2, 1, 4]
+      )
+    end
+  end
 end
