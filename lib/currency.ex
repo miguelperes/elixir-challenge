@@ -47,7 +47,15 @@ defmodule FinancialSystem.Currency do
     case valid_currency?(from_currency) do
       true ->
         rates = FinancialSystem.Currency.parse_file("currency_rates.txt")
-        converted_value = (value / rates[from_currency]) |> Float.round(2)
+
+        decimal_value = Decimal.new(value)
+        decimal_rate = Decimal.new(rates[from_currency])
+
+        converted_value = 
+          Decimal.div(decimal_value, decimal_rate)
+          |> Decimal.round(2)
+          |> Decimal.to_float
+
         {:ok, converted_value}
 
       false ->
