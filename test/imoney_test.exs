@@ -55,8 +55,8 @@ defmodule IMoneyTest do
     assert IMoney.to_string(money, ",") == "15,500"
   end
 
-  test "IMoney ultiplication" do
+  test "IMoney multiplication" do
     money = IMoney.new!(1500, :BRL, 2)
-    assert IMoney.mult(money, 0.5) == IMoney.new!(750, :BRL, 2)
+    assert IMoney.mult(money, "0.5") == IMoney.new!(7500, :BRL, 3)
   end
 end
