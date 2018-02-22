@@ -5,7 +5,7 @@ defmodule FinancialSystem.Money do
   """
   alias FinancialSystem.Currency, as: Currency
 
-  defstruct amount: Decimal.new(0), currency: :USD
+  defstruct amount: nil, currency: :USD
 
   @typedoc """
   A custom type that abstracts money
