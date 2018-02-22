@@ -35,7 +35,14 @@ defmodule FinancialSystem.Currency do
     case valid_currency?(to_currency) do
       true ->
         rates = FinancialSystem.Currency.parse_file("currency_rates.txt")
-        converted_value = (value * rates[to_currency]) |> Float.round(2)
+        decimal_value = Decimal.new(value)
+        decimal_rate = Decimal.new(rates[to_currency])
+        
+        converted_value = 
+          Decimal.mult(decimal_value, decimal_rate)
+          |> Decimal.round(2)
+          |> Decimal.to_float
+
         {:ok, converted_value}
 
       false ->
@@ -92,7 +99,15 @@ defmodule FinancialSystem.Currency do
   def convert(value, exchange_rate) do
     case exchange_rate > 0 do
       true ->
-        {:ok, Float.round(value * exchange_rate, 2)}
+        decimal_value = Decimal.new(value)
+        decimal_rate = Decimal.new(exchange_rate)
+
+        converted = 
+          Decimal.mult(decimal_value, decimal_rate)
+          |> Decimal.round(2)
+          |> Decimal.to_float
+
+        {:ok, converted}
 
       false ->
         {:error, "Invalid exchange rate"}

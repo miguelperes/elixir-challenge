@@ -166,7 +166,14 @@ defmodule FinancialSystem do
           destination_accounts
           |> Enum.with_index()
           |> Enum.map(fn {acc, acc_index} ->
-            amount_to_transfer = unit_amount * Enum.at(weights, acc_index)
+            decimal_unit_amount = Decimal.new(unit_amount)
+            decimal_weight =  Decimal.new(Enum.at(weights, acc_index))
+
+            amount_to_transfer = 
+              Decimal.mult(decimal_unit_amount, decimal_weight)
+              |> Decimal.round(2)
+              |> Decimal.to_float
+
             transfer!(source_account, acc, amount_to_transfer)
           end)
 
