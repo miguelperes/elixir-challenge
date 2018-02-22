@@ -65,8 +65,8 @@ defmodule IMoneyTest do
     assert IMoney.mult(money, "3.84") == IMoney.new!(5760, :BRL, 2)
   end
 
-  test "IMoney multiplication by a number 1" do
-    money = IMoney.new!(1500, :BRL, 2)
-    assert IMoney.mult(money, "1.0") == IMoney.new!(1500, :BRL, 2)
+  test "IMoney multiplication without precision normalization" do
+    money = IMoney.new!(1505, :BRL, 2)
+    assert IMoney.mult(money, "0.5") == IMoney.new!(7525, :BRL, 3)
   end
 end

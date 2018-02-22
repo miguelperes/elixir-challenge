@@ -113,14 +113,7 @@ defmodule FinancialSystem.IMoney do
   """
   @spec mult(IMoney.t(), String.t()) :: IMoney.t()
   def mult(%IMoney{amount: amount, precision: precision, currency: currency}, multiplier) do
-    multiplier_precision =
-      String.split(multiplier, ".")
-      |> List.last()
-      |> String.length()
-
-    integer_multiplier =
-      String.replace(multiplier, ".", "")
-      |> trim_left_zeroes()
+    {multiplier_precision, integer_multiplier} = process_string_multiplier(multiplier)
 
     result_amount = amount * integer_multiplier
     resulting_money = IMoney.new!(result_amount, currency, precision + multiplier_precision)
@@ -140,6 +133,7 @@ defmodule FinancialSystem.IMoney do
     amount_as_string = Integer.to_string(amount)
     last_digit = String.last(amount_as_string)
 
+    
     if last_digit == "0" do
       updated_money =
         String.slice(amount_as_string, 0..-2)
@@ -147,6 +141,7 @@ defmodule FinancialSystem.IMoney do
         |> IMoney.new!(money.currency, money.precision - 1)
 
       normalize_precision(updated_money, precision)
+
     else
       money
     end
@@ -155,6 +150,25 @@ defmodule FinancialSystem.IMoney do
   defp normalize_precision(%IMoney{precision: money_precision} = money, precision)
        when money_precision <= precision do
     money
+  end
+
+  defp process_string_multiplier(multiplier) do
+    if String.contains?(multiplier, ".") do
+      precision =
+        String.split(multiplier, ".")
+        |> List.last()
+        |> String.length()
+  
+      integer_multiplier =
+        String.replace(multiplier, ".", "")
+        |> trim_left_zeroes()
+
+      {precision, integer_multiplier}
+
+    else
+      {0, String.to_integer(multiplier)}
+      
+    end
   end
 
   @doc """
