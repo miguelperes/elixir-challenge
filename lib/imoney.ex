@@ -104,27 +104,27 @@ defmodule FinancialSystem.IMoney do
   end
 
   @doc """
-  Return the multiplication of an IMoney and some multiplier
+  Return the multiplication of an IMoney and some multiplier as a string representation of a float number
 
   ## Examples
       iex> money = FinancialSystem.IMoney.new!(2000, :BRL, 2)
       iex> FinancialSystem.IMoney.mult(money, "0.5")
-      FinancialSystem.IMoney.new!(10000, :BRL, 3)
+      FinancialSystem.IMoney.new!(1000, :BRL, 2)
   """
   @spec mult(IMoney.t(), String.t()) :: IMoney.t()
-  def mult(%IMoney{amount: amount, precision: precision, currency: currency} = money, multiplier) do
+  def mult(%IMoney{amount: amount, precision: precision, currency: currency}, multiplier) do
     multiplier_precision =
       String.split(multiplier, ".")
       |> List.last()
       |> String.length()
 
-    whole_multiplier =
+    integer_multiplier =
       String.replace(multiplier, ".", "")
       |> trim_left_zeroes()
 
-    new_amount = amount * whole_multiplier
-
-    result = IMoney.new!(new_amount, currency, precision + multiplier_precision)
+    result_amount = amount * integer_multiplier
+    resulting_money = IMoney.new!(result_amount, currency, precision + multiplier_precision)
+    normalize_precision(resulting_money, precision)
   end
 
   defp trim_left_zeroes(number) do
@@ -133,6 +133,28 @@ defmodule FinancialSystem.IMoney do
     else
       String.to_integer(number)
     end
+  end
+
+  defp normalize_precision(%IMoney{amount: amount, precision: money_precision} = money, precision)
+       when money_precision > precision do
+    amount_as_string = Integer.to_string(amount)
+    last_digit = String.last(amount_as_string)
+
+    if last_digit == "0" do
+      updated_money =
+        String.slice(amount_as_string, 0..-2)
+        |> String.to_integer()
+        |> IMoney.new!(money.currency, money.precision - 1)
+
+      normalize_precision(updated_money, precision)
+    else
+      money
+    end
+  end
+
+  defp normalize_precision(%IMoney{precision: money_precision} = money, precision)
+       when money_precision <= precision do
+    money
   end
 
   @doc """
