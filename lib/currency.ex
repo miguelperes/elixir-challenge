@@ -37,11 +37,11 @@ defmodule FinancialSystem.Currency do
         rates = FinancialSystem.Currency.parse_file("currency_rates.txt")
         decimal_value = Decimal.new(value)
         decimal_rate = Decimal.new(rates[to_currency])
-        
-        converted_value = 
+
+        converted_value =
           Decimal.mult(decimal_value, decimal_rate)
           |> Decimal.round(2)
-          |> Decimal.to_float
+          |> Decimal.to_float()
 
         {:ok, converted_value}
 
@@ -58,10 +58,10 @@ defmodule FinancialSystem.Currency do
         decimal_value = Decimal.new(value)
         decimal_rate = Decimal.new(rates[from_currency])
 
-        converted_value = 
+        converted_value =
           Decimal.div(decimal_value, decimal_rate)
           |> Decimal.round(2)
-          |> Decimal.to_float
+          |> Decimal.to_float()
 
         {:ok, converted_value}
 
@@ -102,10 +102,10 @@ defmodule FinancialSystem.Currency do
         decimal_value = Decimal.new(value)
         decimal_rate = Decimal.new(exchange_rate)
 
-        converted = 
+        converted =
           Decimal.mult(decimal_value, decimal_rate)
           |> Decimal.round(2)
-          |> Decimal.to_float
+          |> Decimal.to_float()
 
         {:ok, converted}
 

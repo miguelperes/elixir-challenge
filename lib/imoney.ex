@@ -133,7 +133,6 @@ defmodule FinancialSystem.IMoney do
     amount_as_string = Integer.to_string(amount)
     last_digit = String.last(amount_as_string)
 
-    
     if last_digit == "0" do
       updated_money =
         String.slice(amount_as_string, 0..-2)
@@ -141,7 +140,6 @@ defmodule FinancialSystem.IMoney do
         |> IMoney.new!(money.currency, money.precision - 1)
 
       normalize_precision(updated_money, precision)
-
     else
       money
     end
@@ -158,16 +156,14 @@ defmodule FinancialSystem.IMoney do
         String.split(multiplier, ".")
         |> List.last()
         |> String.length()
-  
+
       integer_multiplier =
         String.replace(multiplier, ".", "")
         |> trim_left_zeroes()
 
       {precision, integer_multiplier}
-
     else
       {0, String.to_integer(multiplier)}
-      
     end
   end
 

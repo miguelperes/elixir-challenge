@@ -19,11 +19,11 @@ defmodule CurrencyTest do
   end
 
   test "Check conversion using exchange rate instead of currency symbols. (Not using rates cache)" do
-    expected_result = 
+    expected_result =
       Decimal.new(10)
       |> Decimal.mult(Decimal.new(3.15))
       |> Decimal.round(2)
-      |> Decimal.to_float
+      |> Decimal.to_float()
 
     assert FinancialSystem.Currency.convert!(10.0, 3.15) == expected_result
   end
