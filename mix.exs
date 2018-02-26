@@ -4,7 +4,7 @@ defmodule FinancialSystem.Mixfile do
   def project do
     [
       app: :financial_system,
-      version: "1.2.0",
+      version: "1.2.1",
       elixir: "~> 1.5",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
