@@ -159,8 +159,13 @@ defmodule FinancialSystem do
       when is_list(weights) do
     case FinancialSystem.has_enough(source_account, value) do
       true ->
-        total_parts = Enum.sum(weights)
-        unit_amount = value / total_parts
+        total_parts = 
+          Enum.sum(weights)
+          |> Decimal.new
+
+        value = Decimal.new(value)
+
+        unit_amount = Decimal.div(value, total_parts)
 
         transfers_result =
           destination_accounts
