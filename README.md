@@ -1,5 +1,5 @@
 # Elixir Challenge [![Build Status](https://travis-ci.org/miguelperes/elixir-challenge.svg?branch=master)](https://travis-ci.org/miguelperes/elixir-challenge) [![Coverage Status](https://coveralls.io/repos/github/miguelperes/elixir-challenge/badge.svg?branch=master)](https://coveralls.io/github/miguelperes/elixir-challenge?branch=master)
-Elixir project made for the [Stone Tech Challenge](https://github.com/stone-payments/tech-challenge)
+Elixir project made for the [Stone Tech Challenge](https://github.com/stone-payments/tech-challenge) and to learn the Elixir language
 
 ## About
 
